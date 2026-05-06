@@ -2,6 +2,11 @@
   <div class="shopping-list">
     <h1>EasyList 🛒</h1>
 
+    <!-- 1. Zähler -->
+    <div class="counter">
+      {{ remainingCount }} von {{ items.length }} noch zu kaufen
+    </div>
+
     <div class="form">
       <input v-model="newName" placeholder="Produkt" />
       <input v-model="newQuantity" placeholder="Menge" type="number" min="1" @keydown="preventNegative" />
@@ -35,6 +40,30 @@
       <button @click="addItem">Hinzufügen</button>
     </div>
 
+    <!-- 2. Fehlermeldung -->
+    <div v-if="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- 4. Filter & 5. Alle gekauften löschen -->
+    <div class="toolbar">
+      <select v-model="filterCategory">
+        <option value="">Alle Kategorien</option>
+        <option>Obst & Gemüse</option>
+        <option>Milchprodukte</option>
+        <option>Fleisch & Fisch</option>
+        <option>Backwaren</option>
+        <option>Getränke</option>
+        <option>Tiefkühl</option>
+        <option>Süßigkeiten</option>
+        <option>Haushalt</option>
+        <option>Sonstiges</option>
+      </select>
+      <button class="clear-btn" @click="deleteBought" :disabled="boughtCount === 0">
+        Alle gekauften löschen ({{ boughtCount }})
+      </button>
+    </div>
+
     <div class="list-header">
       <span>Produkt</span>
       <span>Menge</span>
@@ -43,13 +72,18 @@
       <span></span>
     </div>
 
+    <!-- 3. sortedAndFilteredItems statt items -->
     <ShoppingItem
-      v-for="item in items"
+      v-for="item in sortedAndFilteredItems"
       :key="item.id"
       :item="item"
       @delete="deleteItem"
       @toggle="toggleItem"
     />
+
+    <div v-if="sortedAndFilteredItems.length === 0" class="empty-state">
+      Keine Produkte gefunden.
+    </div>
   </div>
 </template>
 
@@ -67,6 +101,8 @@ export default {
       newCategory: '',
       showCustomCategory: false,
       customCategory: '',
+      errorMessage: '',
+      filterCategory: '',
       items: [
         { id: 1, name: 'Milch', quantity: 2, unit: 'L', category: 'Getränke', bought: false },
         { id: 2, name: 'Brot', quantity: 1, unit: 'Stück', category: 'Backwaren', bought: false },
@@ -74,6 +110,23 @@ export default {
         { id: 4, name: 'Käse', quantity: 1, unit: 'Packung', category: 'Milchprodukte', bought: false },
         { id: 5, name: 'Nudeln', quantity: 3, unit: 'Packung', category: 'Sonstiges', bought: false }
       ]
+    }
+  },
+  computed: {
+    // Zähler für noch nicht gekaufte Items
+    remainingCount() {
+      return this.items.filter(item => !item.bought).length
+    },
+    // Zähler für gekaufte Items (für den Löschen-Button)
+    boughtCount() {
+      return this.items.filter(item => item.bought).length
+    },
+    // Items gefiltert nach Kategorie + gekaufte nach unten
+    sortedAndFilteredItems() {
+      let result = this.filterCategory
+        ? this.items.filter(item => item.category === this.filterCategory)
+        : [...this.items]
+      return result.sort((a, b) => Number(a.bought) - Number(b.bought))
     }
   },
   methods: {
@@ -88,8 +141,17 @@ export default {
     },
     addItem() {
       const category = this.showCustomCategory ? this.customCategory : this.newCategory
-      if (!this.newName || !this.newQuantity || !this.newUnit || !category) return
-      if (Number(this.newQuantity) <= 0) return
+      if (!this.newName || !this.newQuantity || !this.newUnit || !category) {
+        this.errorMessage = 'Bitte alle Felder ausfüllen!'
+        setTimeout(() => { this.errorMessage = '' }, 3000)
+        return
+      }
+      if (Number(this.newQuantity) <= 0) {
+        this.errorMessage = 'Menge muss größer als 0 sein!'
+        setTimeout(() => { this.errorMessage = '' }, 3000)
+        return
+      }
+      this.errorMessage = ''
       this.items.push({
         id: Date.now(),
         name: this.newName,
@@ -112,6 +174,9 @@ export default {
       const item = this.items.find(item => item.id === id)
       if (item) item.bought = !item.bought
     },
+    deleteBought() {
+      this.items = this.items.filter(item => !item.bought)
+    },
     preventNegative(event) {
       if (event.key === '-' || event.key === 'e' || event.key === '0' && this.newQuantity === '') {
         event.preventDefault()
@@ -133,12 +198,18 @@ export default {
 }
 h1 {
   color: #2c3e50;
+  margin-bottom: 10px;
+}
+.counter {
+  font-size: 14px;
+  color: #666;
   margin-bottom: 20px;
+  font-weight: 500;
 }
 .form {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
 }
 .form input, .form select {
@@ -158,6 +229,44 @@ h1 {
 .form button:hover {
   background: #3d5166;
 }
+.error-message {
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid #e74c3c;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.toolbar select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1;
+}
+.clear-btn {
+  padding: 8px 14px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.clear-btn:hover:not(:disabled) {
+  background: #c0392b;
+}
+.clear-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 .list-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 2fr 80px;
@@ -168,4 +277,11 @@ h1 {
   font-weight: bold;
   margin-bottom: 5px;
 }
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  padding: 20px;
+  font-style: italic;
+}
 </style>
+npm run dev
