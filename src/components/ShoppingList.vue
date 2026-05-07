@@ -2,7 +2,6 @@
   <div class="shopping-list">
     <h1>EasyList 🛒</h1>
 
-    <!-- 1. Zähler -->
     <div class="counter">
       {{ remainingCount }} von {{ items.length }} noch zu kaufen
     </div>
@@ -40,24 +39,14 @@
       <button @click="addItem">Hinzufügen</button>
     </div>
 
-    <!-- 2. Fehlermeldung -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
 
-    <!-- 4. Filter & 5. Alle gekauften löschen -->
     <div class="toolbar">
       <select v-model="filterCategory">
         <option value="">Alle Kategorien</option>
-        <option>Obst & Gemüse</option>
-        <option>Milchprodukte</option>
-        <option>Fleisch & Fisch</option>
-        <option>Backwaren</option>
-        <option>Getränke</option>
-        <option>Tiefkühl</option>
-        <option>Süßigkeiten</option>
-        <option>Haushalt</option>
-        <option>Sonstiges</option>
+        <option v-for="category in availableCategories" :key="category">{{ category }}</option>
       </select>
       <button class="clear-btn" @click="deleteBought" :disabled="boughtCount === 0">
         Alle gekauften löschen ({{ boughtCount }})
@@ -72,13 +61,13 @@
       <span></span>
     </div>
 
-    <!-- 3. sortedAndFilteredItems statt items -->
     <ShoppingItem
       v-for="item in sortedAndFilteredItems"
       :key="item.id"
       :item="item"
       @delete="deleteItem"
       @toggle="toggleItem"
+      @edit="editItem"
     />
 
     <div v-if="sortedAndFilteredItems.length === 0" class="empty-state">
@@ -113,15 +102,15 @@ export default {
     }
   },
   computed: {
-    // Zähler für noch nicht gekaufte Items
     remainingCount() {
       return this.items.filter(item => !item.bought).length
     },
-    // Zähler für gekaufte Items (für den Löschen-Button)
     boughtCount() {
       return this.items.filter(item => item.bought).length
     },
-    // Items gefiltert nach Kategorie + gekaufte nach unten
+    availableCategories() {
+      return [...new Set(this.items.map(item => item.category))]
+    },
     sortedAndFilteredItems() {
       let result = this.filterCategory
         ? this.items.filter(item => item.category === this.filterCategory)
@@ -174,11 +163,17 @@ export default {
       const item = this.items.find(item => item.id === id)
       if (item) item.bought = !item.bought
     },
+    editItem(updatedItem) {
+      const index = this.items.findIndex(item => item.id === updatedItem.id)
+      if (index !== -1) {
+        this.items[index] = { ...this.items[index], ...updatedItem }
+      }
+    },
     deleteBought() {
       this.items = this.items.filter(item => !item.bought)
     },
     preventNegative(event) {
-      if (event.key === '-' || event.key === 'e' || event.key === '0' && this.newQuantity === '') {
+      if (event.key === '-' || event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '0' && this.newQuantity === '') {
         event.preventDefault()
       }
     }
@@ -269,7 +264,7 @@ h1 {
 }
 .list-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr 80px;
+  grid-template-columns: 2fr 1fr 1fr 2fr 100px;
   padding: 10px;
   background: #2c3e50;
   color: white;
@@ -284,4 +279,3 @@ h1 {
   font-style: italic;
 }
 </style>
-npm run dev
