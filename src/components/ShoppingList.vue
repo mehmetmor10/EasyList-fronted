@@ -92,14 +92,11 @@ export default {
       customCategory: '',
       errorMessage: '',
       filterCategory: '',
-      items: [
-        { id: 1, name: 'Milch', quantity: 2, unit: 'L', category: 'Getränke', bought: false },
-        { id: 2, name: 'Brot', quantity: 1, unit: 'Stück', category: 'Backwaren', bought: false },
-        { id: 3, name: 'Äpfel', quantity: 6, unit: 'Stück', category: 'Obst & Gemüse', bought: false },
-        { id: 4, name: 'Käse', quantity: 1, unit: 'Packung', category: 'Milchprodukte', bought: false },
-        { id: 5, name: 'Nudeln', quantity: 3, unit: 'Packung', category: 'Sonstiges', bought: false }
-      ]
+      items: []
     }
+  },
+  created() {
+    this.fetchItems()
   },
   computed: {
     remainingCount() {
@@ -119,6 +116,22 @@ export default {
     }
   },
   methods: {
+    async fetchItems() {
+      try {
+        const response = await fetch('https://webtech-ss26.onrender.com/items')
+        const data = await response.json()
+        this.items = data.map((item, index) => ({
+          id: index + 1,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit || 'Stück',
+          category: item.category,
+          bought: false
+        }))
+      } catch (error) {
+        console.error('Fehler beim Laden der Items:', error)
+      }
+    },
     handleCategoryChange() {
       if (this.newCategory === 'custom') {
         this.showCustomCategory = true
