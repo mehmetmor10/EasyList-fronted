@@ -6,6 +6,10 @@
       {{ remainingCount }} von {{ items.length }} noch zu kaufen
     </div>
 
+    <div class="search-bar">
+      <input v-model="searchQuery" placeholder="🔍 Produkt suchen..." />
+    </div>
+
     <div class="form">
       <input v-model="newName" placeholder="Produkt" />
       <input v-model="newQuantity" placeholder="Menge" type="number" min="1" @keydown="preventNegative" />
@@ -92,6 +96,7 @@ export default {
       customCategory: '',
       errorMessage: '',
       filterCategory: '',
+      searchQuery: '',
       items: []
     }
   },
@@ -112,6 +117,16 @@ export default {
       let result = this.filterCategory
         ? this.items.filter(item => item.category === this.filterCategory)
         : [...this.items]
+      if (this.searchQuery) {
+        const normalize = (str) => str.toLowerCase()
+          .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue')
+          .replace(/ß/g, 'ss')
+        const query = normalize(this.searchQuery)
+        result = result.filter(item =>
+          normalize(item.name).includes(query) ||
+          normalize(item.category).includes(query)
+        )
+      }
       return result.sort((a, b) => Number(a.bought) - Number(b.bought))
     }
   },
@@ -213,6 +228,21 @@ h1 {
   color: #666;
   margin-bottom: 20px;
   font-weight: 500;
+}
+.search-bar {
+  margin-bottom: 15px;
+}
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.search-bar input:focus {
+  outline: none;
+  border-color: #2c3e50;
 }
 .form {
   display: flex;
