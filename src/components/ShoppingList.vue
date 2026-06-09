@@ -156,7 +156,7 @@ export default {
         this.customCategory = ''
       }
     },
-    addItem() {
+    async addItem() {
       const category = this.showCustomCategory ? this.customCategory : this.newCategory
       if (!this.newName || !this.newQuantity || !this.newUnit || !category) {
         this.errorMessage = 'Bitte alle Felder ausfüllen!'
@@ -169,14 +169,22 @@ export default {
         return
       }
       this.errorMessage = ''
-      this.items.push({
-        id: Date.now(),
-        name: this.newName,
-        quantity: Number(this.newQuantity),
-        unit: this.newUnit,
-        category: category,
-        bought: false
-      })
+      try {
+        await fetch('https://webtech-ss26.onrender.com/items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: this.newName,
+            quantity: Number(this.newQuantity),
+            unit: this.newUnit,
+            category: category
+          })
+        })
+        await this.fetchItems()
+      } catch (error) {
+        this.errorMessage = 'Fehler beim Speichern!'
+        setTimeout(() => { this.errorMessage = '' }, 3000)
+      }
       this.newName = ''
       this.newQuantity = ''
       this.newUnit = ''
