@@ -133,10 +133,10 @@ export default {
   methods: {
     async fetchItems() {
       try {
-        const response = await fetch('https://webtech-ss26.onrender.com/items')
+        const response = await fetch('https://easylist-backend.onrender.com/items')
         const data = await response.json()
-        this.items = data.map((item, index) => ({
-          id: index + 1,
+        this.items = data.map((item) => ({
+          id: item.id,
           name: item.name,
           quantity: item.quantity,
           unit: item.unit || 'Stück',
@@ -145,15 +145,6 @@ export default {
         }))
       } catch (error) {
         console.error('Fehler beim Laden der Items:', error)
-      }
-    },
-    handleCategoryChange() {
-      if (this.newCategory === 'custom') {
-        this.showCustomCategory = true
-        this.newCategory = ''
-      } else {
-        this.showCustomCategory = false
-        this.customCategory = ''
       }
     },
     async addItem() {
@@ -170,7 +161,7 @@ export default {
       }
       this.errorMessage = ''
       try {
-        await fetch('https://webtech-ss26.onrender.com/items', {
+        await fetch('https://easylist-backend.onrender.com/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -192,8 +183,15 @@ export default {
       this.showCustomCategory = false
       this.customCategory = ''
     },
-    deleteItem(id) {
-      this.items = this.items.filter(item => item.id !== id)
+    async deleteItem(id) {
+      try {
+        await fetch(`https://easylist-backend.onrender.com/items/${id}`, {
+          method: 'DELETE'
+        })
+        await this.fetchItems()
+      } catch (error) {
+        console.error('Fehler beim Löschen:', error)
+      }
     },
     toggleItem(id) {
       const item = this.items.find(item => item.id === id)
