@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import ShoppingList from '../components/ShoppingList.vue'
 
 describe('ShoppingList', () => {
-  it('zeigt den Titel EasyList', () => {
+  it('zeigt die App korrekt an', () => {
     const wrapper = mount(ShoppingList, {
       global: {
         stubs: {
@@ -11,7 +11,7 @@ describe('ShoppingList', () => {
         }
       }
     })
-    expect(wrapper.text()).toContain('EasyList')
+    expect(wrapper.text()).toContain('Hinzufügen')
   })
 
   it('zeigt Fehlermeldung wenn Felder leer sind', async () => {
