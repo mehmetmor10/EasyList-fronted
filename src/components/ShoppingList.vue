@@ -1,5 +1,6 @@
 <template>
   <div class="shopping-list">
+    <h2 class="list-title">📋 {{ listName }}</h2>
 
     <div class="counter">
       {{ remainingCount }} von {{ items.length }} noch zu kaufen
@@ -79,7 +80,7 @@
       @edit="editItem"
     />
 
-    <div v-if="sortedAndFilteredItems.length === 0" class="empty-state">
+    <div v-if="sortedAndFilteredItems.length === 0 && !loading" class="empty-state">
       Keine Produkte gefunden.
     </div>
   </div>
@@ -90,6 +91,10 @@ import ShoppingItem from './ShoppingItem.vue'
 
 export default {
   name: 'ShoppingList',
+  props: {
+    listId: { type: Number, required: true },
+    listName: { type: String, required: true }
+  },
   components: { ShoppingItem },
   data() {
     return {
@@ -139,7 +144,7 @@ export default {
   methods: {
     async fetchItems() {
       try {
-        const response = await fetch('https://easylist-backend.onrender.com/items')
+        const response = await fetch(`https://easylist-backend.onrender.com/lists/${this.listId}/items`)
         const data = await response.json()
         this.items = data.map(item => ({
           id: item.id,
@@ -178,7 +183,7 @@ export default {
       }
       this.errorMessage = ''
       try {
-        await fetch('https://easylist-backend.onrender.com/items', {
+        await fetch(`https://easylist-backend.onrender.com/lists/${this.listId}/items`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -268,6 +273,13 @@ export default {
 
 h1 {
   display: none;
+}
+
+.list-title {
+  color: #27ae60;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
 }
 
 .counter {

@@ -1,11 +1,15 @@
 <script setup>
+import { ref } from 'vue'
+import ShoppingLists from './components/ShoppingLists.vue'
 import ShoppingList from './components/ShoppingList.vue'
+
+const selectedList = ref(null)
 </script>
 
 <template>
   <div class="app">
     <header class="app-header">
-      <div class="logo">
+      <div class="logo" @click="selectedList = null" style="cursor: pointer">
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="20" cy="20" r="20" fill="#2ecc71"/>
           <path d="M10 13h3.5l4 11h8l3-8.5H14.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -15,9 +19,13 @@ import ShoppingList from './components/ShoppingList.vue'
         </svg>
         <span class="logo-text">EasyList</span>
       </div>
+      <button v-if="selectedList" class="back-btn" @click="selectedList = null">
+        ← Zurück zu Listen
+      </button>
     </header>
     <main>
-      <ShoppingList />
+      <ShoppingLists v-if="!selectedList" @selectList="selectedList = $event" />
+      <ShoppingList v-else :listId="selectedList.id" :listName="selectedList.name" />
     </main>
   </div>
 </template>
@@ -47,6 +55,7 @@ body {
   box-shadow: 0 2px 8px rgba(46, 204, 113, 0.15);
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .logo {
@@ -60,5 +69,22 @@ body {
   font-weight: 700;
   color: #27ae60;
   letter-spacing: -0.5px;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background: #f0fff4;
+  color: #27ae60;
+  border: 2px solid #2ecc71;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: #2ecc71;
+  color: white;
 }
 </style>
