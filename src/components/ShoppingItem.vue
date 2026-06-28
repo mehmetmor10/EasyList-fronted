@@ -4,7 +4,7 @@
       <span class="name">{{ item.name }}</span>
       <span class="quantity">{{ item.quantity }}</span>
       <span class="unit">{{ item.unit }}</span>
-      <span class="category">{{ item.category }}</span>
+      <span class="category">{{ getCategorySymbol(item.category) }} {{ item.category }}</span>
       <div class="actions">
         <button class="check-btn" @click="$emit('toggle', item.id)">✓</button>
         <button class="edit-btn" @click="startEdit">✏️</button>
@@ -29,7 +29,8 @@
       </select>
       <div class="edit-category">
         <select v-model="editCategory" @change="handleEditCategoryChange" class="edit-input">
-          <option>Obst & Gemüse</option>
+          <option>Obst</option>
+          <option>Gemüse</option>
           <option>Milchprodukte</option>
           <option>Fleisch & Fisch</option>
           <option>Backwaren</option>
@@ -37,6 +38,7 @@
           <option>Tiefkühl</option>
           <option>Süßigkeiten</option>
           <option>Haushalt</option>
+          <option>Tierbedarf</option>
           <option>Sonstiges</option>
           <option value="custom">Eigene Kategorie...</option>
         </select>
@@ -129,9 +131,26 @@ export default {
       })
       this.editing = false
       this.editError = ''
-    }
-  }
-}
+    },
+       getCategorySymbol(category) {
+         const symbols = {
+           'Obst': '🍎',
+           'Gemüse': '🥦',
+           'Milchprodukte': '🥛',
+           'Fleisch & Fisch': '🥩',
+           'Backwaren': '🍞',
+           'Getränke': '🥤',
+           'Tiefkühl': '🧊',
+           'Süßigkeiten': '🍬',
+           'Haushalt': '🧹',
+           'Tierbedarf': '🐾',
+           'Sonstiges': '📦'
+         }
+         return symbols[category] || '🛒'
+       }
+     }
+   }
+
 </script>
 
 <style scoped>

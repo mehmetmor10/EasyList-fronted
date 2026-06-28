@@ -28,7 +28,8 @@
       </select>
       <select v-model="newCategory" @change="handleCategoryChange">
         <option value="" disabled>Kategorie</option>
-        <option>Obst & Gemüse</option>
+        <option>Obst</option>
+        <option>Gemüse</option>
         <option>Milchprodukte</option>
         <option>Fleisch & Fisch</option>
         <option>Backwaren</option>
@@ -36,6 +37,7 @@
         <option>Tiefkühl</option>
         <option>Süßigkeiten</option>
         <option>Haushalt</option>
+        <option>Tierbedarf</option>
         <option>Sonstiges</option>
         <option value="custom">Eigene Kategorie...</option>
       </select>
