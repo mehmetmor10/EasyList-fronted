@@ -194,8 +194,15 @@ export default {
       this.showCustomCategory = false
       this.customCategory = ''
     },
-    deleteItem(id) {
-      this.items = this.items.filter(item => item.id !== id)
+    async deleteItem(id) {
+      try {
+        await fetch(`https://easylist-backend.onrender.com/items/${id}`, {
+          method: 'DELETE'
+        })
+        await this.fetchItems()
+      } catch (error) {
+        console.error('Fehler beim Löschen:', error)
+      }
     },
     toggleItem(id) {
       const item = this.items.find(item => item.id === id)
