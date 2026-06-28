@@ -1,6 +1,5 @@
 <template>
   <div class="shopping-list">
-    <h1>EasyList 🛒</h1>
 
     <div class="counter">
       {{ remainingCount }} von {{ items.length }} noch zu kaufen
@@ -67,6 +66,10 @@
       <span></span>
     </div>
 
+    <div v-if="loading" class="loading">
+      ⏳ Laden...
+    </div>
+
     <ShoppingItem
       v-for="item in sortedAndFilteredItems"
       :key="item.id"
@@ -90,6 +93,7 @@ export default {
   components: { ShoppingItem },
   data() {
     return {
+      loading: true,
       newName: '',
       newQuantity: '',
       newUnit: '',
@@ -147,6 +151,8 @@ export default {
         }))
       } catch (error) {
         console.error('Fehler beim Laden der Items:', error)
+      } finally {
+        this.loading = false
       }
     },
     handleCategoryChange() {
@@ -225,8 +231,20 @@ export default {
         console.error('Fehler beim Bearbeiten:', error)
       }
     },
-    deleteBought() {
-      this.items = this.items.filter(item => !item.bought)
+    async deleteBought() {
+      try {
+        const boughtItems = this.items.filter(item => item.bought)
+        await Promise.all(
+          boughtItems.map(item =>
+            fetch(`https://easylist-backend.onrender.com/items/${item.id}`, {
+              method: 'DELETE'
+            })
+          )
+        )
+        await this.fetchItems()
+      } catch (error) {
+        console.error('Fehler beim Löschen:', error)
+      }
     },
     preventNegative(event) {
       if (event.key === '-' || event.key === 'e' || event.key === 'E' || event.key === '+' || event.key === '0' && this.newQuantity === '') {
@@ -239,71 +257,110 @@ export default {
 
 <style scoped>
 .shopping-list {
-  max-width: 750px;
+  max-width: 780px;
   margin: 40px auto;
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  font-family: 'Inter', sans-serif;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(46, 204, 113, 0.12);
 }
+
 h1 {
-  color: #2c3e50;
-  margin-bottom: 10px;
+  display: none;
 }
+
 .counter {
   font-size: 14px;
-  color: #666;
+  color: #27ae60;
   margin-bottom: 20px;
-  font-weight: 500;
+  font-weight: 600;
+  background: #f0fff4;
+  padding: 8px 14px;
+  border-radius: 20px;
+  display: inline-block;
 }
+
 .search-bar {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
+
 .search-bar input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 2px solid #e8f8f0;
+  border-radius: 10px;
   font-size: 14px;
   box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+  background: #f9fffe;
 }
+
 .search-bar input:focus {
   outline: none;
-  border-color: #2c3e50;
+  border-color: #2ecc71;
 }
+
 .form {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
+  background: #f9fffe;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid #e8f8f0;
 }
+
 .form input, .form select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid #d5f5e3;
+  border-radius: 8px;
   flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  background: white;
 }
+
+.form input:focus, .form select:focus {
+  outline: none;
+  border-color: #2ecc71;
+}
+
 .form button {
-  padding: 8px 16px;
-  background: #2c3e50;
+  padding: 10px 20px;
+  background: #2ecc71;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.1s;
 }
+
 .form button:hover {
-  background: #3d5166;
+  background: #27ae60;
+  transform: translateY(-1px);
 }
+
+.form button:active {
+  transform: translateY(0);
+}
+
 .error-message {
   background: #fdecea;
   color: #c0392b;
   border: 1px solid #e74c3c;
-  border-radius: 6px;
-  padding: 8px 14px;
+  border-radius: 8px;
+  padding: 10px 16px;
   margin-bottom: 14px;
   font-size: 14px;
 }
+
 .toolbar {
   display: flex;
   gap: 10px;
@@ -311,42 +368,71 @@ h1 {
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
+
 .toolbar select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid #d5f5e3;
+  border-radius: 8px;
   flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background: white;
 }
+
 .clear-btn {
-  padding: 8px 14px;
+  padding: 10px 16px;
   background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
   white-space: nowrap;
+  transition: background 0.2s;
 }
+
 .clear-btn:hover:not(:disabled) {
   background: #c0392b;
 }
+
 .clear-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
+
 .list-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 2fr 100px;
-  padding: 10px;
-  background: #2c3e50;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
-  border-radius: 8px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
 }
+
 .empty-state {
   text-align: center;
   color: #aaa;
-  padding: 20px;
+  padding: 40px 20px;
   font-style: italic;
+  font-size: 15px;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 16px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 </style>

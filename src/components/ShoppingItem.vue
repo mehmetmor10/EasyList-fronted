@@ -157,86 +157,143 @@ export default {
 .shopping-item {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 2fr 100px;
-  padding: 12px 10px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e8f8f0;
   background: white;
   align-items: center;
+  transition: background 0.15s;
+  border-radius: 8px;
+  margin-bottom: 2px;
 }
+
 .shopping-item:hover {
-  background: #f0f4ff;
+  background: #f0fff4;
 }
+
 .shopping-item.bought {
-  background: #f5f5f5;
-  color: #aaa;
+  background: #f9f9f9;
+  color: #bbb;
   text-decoration: line-through;
 }
+
 .name {
-  font-weight: bold;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 15px;
 }
+
+.shopping-item.bought .name {
+  color: #bbb;
+}
+
 .edit-input {
-  padding: 4px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 6px 8px;
+  border: 1.5px solid #d5f5e3;
+  border-radius: 6px;
   width: 90%;
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
 }
+
+.edit-input:focus {
+  outline: none;
+  border-color: #2ecc71;
+}
+
 .edit-category {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+
 .actions {
   display: flex;
-  gap: 4px;
+  gap: 5px;
 }
+
 .check-btn {
-  padding: 4px 6px;
-  background: #27ae60;
+  padding: 5px 8px;
+  background: #2ecc71;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
 }
+
+.check-btn:hover {
+  background: #27ae60;
+  transform: translateY(-1px);
+}
+
 .edit-btn {
-  padding: 4px 6px;
+  padding: 5px 8px;
   background: #f39c12;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
+
+.edit-btn:hover {
+  background: #d68910;
+  transform: translateY(-1px);
+}
+
 .delete-btn {
-  padding: 4px 6px;
+  padding: 5px 8px;
   background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
+
+.delete-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
 .save-btn {
-  padding: 4px 6px;
-  background: #2980b9;
+  padding: 5px 8px;
+  background: #2ecc71;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s;
 }
+
+.save-btn:hover {
+  background: #27ae60;
+}
+
 .cancel-btn {
-  padding: 4px 6px;
+  padding: 5px 8px;
   background: #95a5a6;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s;
 }
+
+.cancel-btn:hover {
+  background: #7f8c8d;
+}
+
 .edit-error {
   grid-column: 1 / -1;
   color: #c0392b;
   background: #fdecea;
   border: 1px solid #e74c3c;
-  border-radius: 4px;
-  padding: 4px 10px;
+  border-radius: 6px;
+  padding: 6px 12px;
   font-size: 13px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 </style>
