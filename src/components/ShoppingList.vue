@@ -135,7 +135,7 @@ export default {
       try {
         const response = await fetch('https://easylist-backend.onrender.com/items')
         const data = await response.json()
-        this.items = data.map((item) => ({
+        this.items = data.map(item => ({
           id: item.id,
           name: item.name,
           quantity: item.quantity,
@@ -145,6 +145,15 @@ export default {
         }))
       } catch (error) {
         console.error('Fehler beim Laden der Items:', error)
+      }
+    },
+    handleCategoryChange() {
+      if (this.newCategory === 'custom') {
+        this.showCustomCategory = true
+        this.newCategory = ''
+      } else {
+        this.showCustomCategory = false
+        this.customCategory = ''
       }
     },
     async addItem() {
@@ -183,24 +192,28 @@ export default {
       this.showCustomCategory = false
       this.customCategory = ''
     },
-    async deleteItem(id) {
-      try {
-        await fetch(`https://easylist-backend.onrender.com/items/${id}`, {
-          method: 'DELETE'
-        })
-        await this.fetchItems()
-      } catch (error) {
-        console.error('Fehler beim Löschen:', error)
-      }
+    deleteItem(id) {
+      this.items = this.items.filter(item => item.id !== id)
     },
     toggleItem(id) {
       const item = this.items.find(item => item.id === id)
       if (item) item.bought = !item.bought
     },
-    editItem(updatedItem) {
-      const index = this.items.findIndex(item => item.id === updatedItem.id)
-      if (index !== -1) {
-        this.items[index] = { ...this.items[index], ...updatedItem }
+    async editItem(updatedItem) {
+      try {
+        await fetch(`https://easylist-backend.onrender.com/items/${updatedItem.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: updatedItem.name,
+            quantity: updatedItem.quantity,
+            unit: updatedItem.unit,
+            category: updatedItem.category
+          })
+        })
+        await this.fetchItems()
+      } catch (error) {
+        console.error('Fehler beim Bearbeiten:', error)
       }
     },
     deleteBought() {
