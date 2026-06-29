@@ -62,7 +62,10 @@ export default {
   methods: {
     async fetchLists() {
       try {
-        const response = await fetch('https://easylist-backend.onrender.com/lists')
+        const token = localStorage.getItem('token')
+        const response = await fetch('https://easylist-backend.onrender.com/lists', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
         this.lists = await response.json()
       } catch (error) {
         console.error('Fehler beim Laden der Listen:', error)
@@ -77,9 +80,13 @@ export default {
         return
       }
       try {
+        const token = localStorage.getItem('token')
         await fetch('https://easylist-backend.onrender.com/lists', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({ name: this.newListName })
         })
         this.newListName = ''
