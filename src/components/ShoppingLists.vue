@@ -61,7 +61,6 @@ export default {
   },
   methods: {
     async fetchLists() {
-      this.loading = true
       try {
         const response = await fetch('https://easylist-backend.onrender.com/lists')
         this.lists = await response.json()

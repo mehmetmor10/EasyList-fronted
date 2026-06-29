@@ -1,9 +1,24 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import ShoppingLists from './components/ShoppingLists.vue'
 import ShoppingList from './components/ShoppingList.vue'
 
 const selectedList = ref(null)
+
+onMounted(() => {
+  const saved = localStorage.getItem('selectedList')
+  if (saved) {
+    selectedList.value = JSON.parse(saved)
+  }
+})
+
+watch(selectedList, (newVal) => {
+  if (newVal) {
+    localStorage.setItem('selectedList', JSON.stringify(newVal))
+  } else {
+    localStorage.removeItem('selectedList')
+  }
+})
 </script>
 
 <template>
