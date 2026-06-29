@@ -3,12 +3,16 @@ import { describe, it, expect } from 'vitest'
 import ShoppingList from '../components/ShoppingList.vue'
 
 describe('ShoppingList', () => {
+  const defaultProps = {
+    listId: 1,
+    listName: 'Testliste'
+  }
+
   it('zeigt die App korrekt an', () => {
     const wrapper = mount(ShoppingList, {
+      props: defaultProps,
       global: {
-        stubs: {
-          ShoppingItem: true
-        }
+        stubs: { ShoppingItem: true }
       }
     })
     expect(wrapper.text()).toContain('Hinzufügen')
@@ -16,10 +20,9 @@ describe('ShoppingList', () => {
 
   it('zeigt Fehlermeldung wenn Felder leer sind', async () => {
     const wrapper = mount(ShoppingList, {
+      props: defaultProps,
       global: {
-        stubs: {
-          ShoppingItem: true
-        }
+        stubs: { ShoppingItem: true }
       }
     })
     await wrapper.find('button').trigger('click')
@@ -28,10 +31,9 @@ describe('ShoppingList', () => {
 
   it('Suchfeld ist vorhanden', () => {
     const wrapper = mount(ShoppingList, {
+      props: defaultProps,
       global: {
-        stubs: {
-          ShoppingItem: true
-        }
+        stubs: { ShoppingItem: true }
       }
     })
     const searchInput = wrapper.find('.search-bar input')

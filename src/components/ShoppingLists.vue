@@ -66,6 +66,13 @@ export default {
         const response = await fetch('https://easylist-backend.onrender.com/lists', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
+        if (response.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('username')
+          localStorage.removeItem('selectedList')
+          window.location.reload()
+          return
+        }
         this.lists = await response.json()
       } catch (error) {
         console.error('Fehler beim Laden der Listen:', error)

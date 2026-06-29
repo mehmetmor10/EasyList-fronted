@@ -44,6 +44,15 @@ function logout() {
   username.value = ''
   selectedList.value = null
 }
+
+function checkAuth() {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    logout()
+    return false
+  }
+  return true
+}
 </script>
 
 <template>
