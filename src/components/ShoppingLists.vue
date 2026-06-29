@@ -37,6 +37,9 @@
         <div class="list-date">
           {{ formatDate(list.createdAt) }}
         </div>
+        <div class="list-item-count">
+          🛒 {{ list.itemCount }} {{ list.itemCount === 1 ? 'Produkt' : 'Produkte' }}
+        </div>
       </div>
     </div>
   </div>
@@ -73,7 +76,13 @@ export default {
           window.location.reload()
           return
         }
-        this.lists = await response.json()
+        const lists = await response.json()
+        for (const list of lists) {
+          const itemsResponse = await fetch(`https://easylist-backend.onrender.com/lists/${list.id}/items`)
+          const items = await itemsResponse.json()
+          list.itemCount = items.length
+        }
+        this.lists = lists
       } catch (error) {
         console.error('Fehler beim Laden der Listen:', error)
       } finally {
@@ -103,6 +112,9 @@ export default {
       }
     },
     async deleteList(id) {
+      if (!confirm('Bist du sicher dass du diese Liste löschen möchtest?')) {
+        return
+      }
       try {
         await fetch(`https://easylist-backend.onrender.com/lists/${id}`, {
           method: 'DELETE'
@@ -322,5 +334,12 @@ h2 {
 .list-date {
   font-size: 12px;
   color: #aaa;
+}
+
+.list-item-count {
+  font-size: 12px;
+  color: #27ae60;
+  font-weight: 600;
+  margin-top: 4px;
 }
 </style>
