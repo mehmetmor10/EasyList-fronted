@@ -56,8 +56,8 @@
 
 <script>
 const STANDARD_CATEGORIES = [
-  'Obst & Gemüse', 'Milchprodukte', 'Fleisch & Fisch', 'Backwaren',
-  'Getränke', 'Tiefkühl', 'Süßigkeiten', 'Haushalt', 'Sonstiges'
+  'Obst', 'Gemüse', 'Milchprodukte', 'Fleisch & Fisch', 'Backwaren',
+  'Getränke', 'Tiefkühl', 'Süßigkeiten', 'Haushalt', 'Tierbedarf', 'Sonstiges'
 ]
 
 export default {
